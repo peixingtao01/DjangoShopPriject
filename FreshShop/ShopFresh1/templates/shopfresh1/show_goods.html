@@ -1,0 +1,67 @@
+{% extends 'shopfresh1/base.html' %}
+
+{% block title %}
+    商品列表
+{% endblock %}
+
+{% block content %}
+
+    <div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h5 class="m-0 font-weight-bold text-primary">商品列表</h5>
+    </div>
+        <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>商品名称</th>
+                    <th>商品价格</th>
+                    <th>商品数量</th>
+                    <th>出厂日期</th>
+                    <th>保质期</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for goods in goods_list %}
+                    <tr>
+                        <td>{{ goods.goods_name }}</td>
+                        <td><input type="text" value="{{ goods.goods_price }}"></td>
+                        <td>{{ goods.goods_number }}</td>
+                        <td>{{ goods.goods_date }}</td>
+                        <td>{{ goods.goods_safeDate }}</td>
+                        <td>
+                            <a href="" class="btn btn-warning">下架</a>
+                            <a href="" class="btn btn-danger">删除</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+    {#        <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">#}
+    {#            <div class="input-group">#}
+    {#                <input type="text" class="form-control bg-light border-0 small">#}
+    {#                <div class="input-group-append">#}
+    {#                    <button class="btn btn-primary"type="submit">#}
+    {#                        <i class="fas fa-search fa-sm"></i>#}
+    {#                    </button>#}
+    {#                </div>#}
+    {#            </div>#}
+    {#        </form>#}
+    {#    #}
+
+        </table>
+        <div class="col-sm-12 col-md-7">
+            <div class="dataTables_paginate paging_simple_numbers">
+            <ul class="pagination">
+                {% for i in page_range %}
+                <li class="paginate_button page-item">
+                    <a href="?keywords={{ keywords }}&page_num={{ i }}" class="page-link">{{ i }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        </div>
+        </div>
+    </div>
+
+{% endblock %}
