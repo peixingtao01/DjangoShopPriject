@@ -136,8 +136,34 @@ def list_goods(request):
     return render(request,'ShopFresh1/show_goods.html',locals())
 
 
+def goods_detail(request,goods_id):
+    goods_data = Goods.objects.filter(id = goods_id).first()
+    return render(request,'shopfresh1/goods_detail.html',locals())
 
 
+def goods_update(request,goods_id):
+    goods_data = Goods.objects.filter(id=goods_id).first()
+    if request.method=='POST':
+        # goods_id = request.POST.get('goods_id')
+        goods_image = request.FILES.get('goods_image')
+        goods_price = request.POST.get('goods_price')
+        goods_number = request.POST.get('goods_number')
+        goods_description = request.POST.get('goods_description')
+        goods = Goods.objects.get(id = int(goods_data.id))
+        if goods_price:
+            goods.goods_price = goods_price
+            goods.save()
+        if goods_number:
+            goods.goods_number = goods_number
+            goods.save()
+        if goods_description:
+            goods.goods_description = goods_description
+            goods.save()
+        if goods_image:
+            goods.goods_image = goods_image
+            goods.save()
+        return HttpResponseRedirect('/store/goods_detail/'+str(goods_data.id)+'/')
+    return render(request,'shopfresh1/goods_update.html',locals())
 
 
 

@@ -1,0 +1,53 @@
+{% extends 'shopfresh1/base.html' %}
+
+{% block title %}
+{{ goods_data.goods_name }}详情
+{% endblock %}
+
+{% block content %}
+    <div class="card shadow mb-4">
+        <div class="table-responsive">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <table class="table table-bordered">
+                <tr>
+                    <td rowspan="2">
+                        <img style="width: 200px;height: 200px;" src="/static/{{ goods_data.goods_image }}" alt="{{ goods_data.goods_name }}">
+                        <br/>
+                        <input type="file" name="goods_image" />
+                    </td>
+                    <th style="text-align: center;">商品名称</th>
+                    <td colspan="3">{{ goods_data.goods_name }}
+                    </td>
+                </tr>
+                <tr>
+                    <th style="text-align: center;">商品库存</th>
+                    <td>
+                        <input type="text" value="{{ goods_data.goods_number }}" name="goods_number" class="form-control form-control-user"/>
+                    </td>
+                    <th style="text-align: center;">商品价格</th>
+                    <td>
+                        <input type="text" value="{{ goods_data.goods_price }}" name="goods_price" class="form-control form-control-user"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th colspan="5" style="text-align: center;">商品说明</th>
+                </tr>
+                <tr>
+                    <td colspan="5">
+                        <textarea name="goods_description" cols="30" rows="10">
+                            {{ goods_data.goods_description }}
+                        </textarea>
+                    </td>
+                </tr>
+            </table>
+                <input type="submit" value="提交" class="btn btn-facebook btn-user btn-block"/>
+{#            <a href="#" class="btn btn-facebook btn-user btn-block">修改</a>#}
+            </form>
+        </div>
+    </div>
+    <script src="/static/ckeditor/ckeditor/ckeditor.js"></script>
+    <script>
+        CKEDITOR.replace('goods_description',{uiColor:'rgb(200,236,204)'})
+    </script>
+{% endblock %}

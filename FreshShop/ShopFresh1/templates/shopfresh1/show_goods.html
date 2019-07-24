@@ -25,7 +25,7 @@
             <tbody>
                 {% for goods in goods_list %}
                     <tr>
-                        <td>{{ goods.goods_name }}</td>
+                        <td><a href="/store/goods_detail/{{ goods.id }}/">{{ goods.goods_name }}</a></td>
                         <td><input type="text" value="{{ goods.goods_price }}"></td>
                         <td>{{ goods.goods_number }}</td>
                         <td>{{ goods.goods_date }}</td>
@@ -47,15 +47,15 @@
     {#                </div>#}
     {#            </div>#}
     {#        </form>#}
-    {#    #}
-
         </table>
         <div class="col-sm-12 col-md-7">
             <div class="dataTables_paginate paging_simple_numbers">
             <ul class="pagination">
                 {% for i in page_range %}
                 <li class="paginate_button page-item">
-                    <a href="?keywords={{ keywords }}&page_num={{ i }}" class="page-link">{{ i }}</a>
+                    <a href="?keywords={{ keywords }}&page_num={{ i }}" class="page-link">
+                        {{ i }}
+                    </a>
                 </li>
                 {% endfor %}
             </ul>
