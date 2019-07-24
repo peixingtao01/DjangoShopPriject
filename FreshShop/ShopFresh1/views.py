@@ -32,10 +32,13 @@ def login(request):
         password = request.POST.get('password')
         if username and password:
             user = Seller.objects.filter(username=username).first()
+            # 1、先校验用户是否存在
             user_id = user.id
             if user:
                 web_password = set_mima(password)
+                # 2、验证密码是否正确
                 cookies = request.COOKIES.get('login_from')
+                # 3、请求是否来自登录页面
                 if user.password == web_password and cookies == 'login_page':
                     # 密码输入正确，并且cookie正确
                     response = HttpResponseRedirect('/store/index/')
@@ -43,6 +46,13 @@ def login(request):
                     # 那么我给这个用户，设置了session，这样他在本站的所有页面就不会再次登录了
                     response.set_cookie('user_id',user_id)
                     request.session['username'] = username
+                    store = Store.objects.filter(user_id=user_id).first()#查询店铺是否存在
+                    if store:
+                        response.set_cookie('has_store',store.id)
+                        # 有店铺如果存在下发一个属于自己本身的cookie，这个的目的是为了显示前端的店铺页面
+                    else:
+                        response.set_cookie('has_store','')
+                        #  没有店铺，那个下发一个空的cookie，就是为了前端页面进行判断的
                     return response
     return response
 
@@ -90,6 +100,7 @@ def register_store(request):
             store_type = StoreType.objects.get(id=i)
             store.type.add(store_type)
         store.save()
+        return HttpResponseRedirect('/store/index/')
     return render(request,'ShopFresh1/register_store.html',locals())
 
 def add_goods(request):
@@ -100,10 +111,10 @@ def add_goods(request):
         goods_description = request.POST.get('goods_description')
         goods_date = request.POST.get('goods_date')
         goods_safeDate = request.POST.get('goods_safeDate')
-        store_id = request.POST.get('store_id')
-
+        # store_id = request.POST.get('store_id')
         goods_image = request.FILES.get('goods_image')
 
+        goods_store = request.COOKIES.get('has_store')
         #保存数据
         goods = Goods()
         goods.goods_name=goods_name
@@ -115,7 +126,7 @@ def add_goods(request):
         goods.goods_image = goods_image
         goods.save()#对应表有多对多时，保存两次
         # 保存多对多数据
-        store_idint = int(store_id)
+        store_idint = int(goods_store)
         goods.store_id.add(
             Store.objects.get(user_id= store_idint)
         )
@@ -125,11 +136,16 @@ def add_goods(request):
 def list_goods(request):
     keywords = request.GET.get('keywords','')
     page_num = request.GET.get('page_num',1)
+    # 新增
+    store_id = request.COOKIES.get('has_store')
+    store_id = int(store_id)
+    store = Store.objects.get(id=store_id)
     if keywords:
         # 模糊查询
-        goods_list = Goods.objects.filter(goods_name__contains=keywords)
+        goods_list = store.goods_set.filter(goods_name__contains=keywords)
+        # goods_list = Goods.objects.filter(goods_name__contains=keywords)
     else:
-        goods_list = Goods.objects.all()
+        goods_list = store.goods_set.all()
     paginator = Paginator(goods_list,3)
     page = paginator.page(int(page_num))
     page_range = paginator.page_range

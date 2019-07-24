@@ -15,7 +15,7 @@
             <div class="form-group"><input type="text" class="form-control form-control-user" name="goods_description" placeholder="商品描述"></div>
             <div class="form-group"><input type="text" class="form-control form-control-user" name="goods_date" placeholder="出厂日期"></div>
             <div class="form-group"><input type="text" class="form-control form-control-user" name="goods_safeDate" placeholder="保质期"></div>
-            <div class="form-group"><input type="hidden" class="form-control form-control-user" name="store_id" value="1"></div>
+            <div class="form-group"><input type="hidden" class="form-control form-control-user" name="store_id" value="{{ request.COOKIES.has_store }}"></div>
             <div class="form-group"><input type="submit" class="btn btn-facebook btn-user btn-block" value="添加"></div>
         </form>
     </div>
