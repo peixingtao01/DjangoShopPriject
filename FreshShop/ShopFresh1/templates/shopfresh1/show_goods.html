@@ -26,12 +26,16 @@
                 {% for goods in goods_list %}
                     <tr>
                         <td><a href="/store/goods_detail/{{ goods.id }}/">{{ goods.goods_name }}</a></td>
-                        <td><input type="text" value="{{ goods.goods_price }}"></td>
+                        <td><input type="text" value="/static/{{ goods.goods_price }}"></td>
                         <td>{{ goods.goods_number }}</td>
                         <td>{{ goods.goods_date }}</td>
                         <td>{{ goods.goods_safeDate }}</td>
                         <td>
-                            <a href="" class="btn btn-warning">下架</a>
+                            {% ifequal state 'up' %}
+                                <a href="/store/set_goods/down/?id={{ goods.id }}" class="btn btn-warning">下架</a>
+                            {% else %}
+                                <a href="/store/set_goods/up/?id={{ goods.id }}" class="btn btn-warning">上架</a>
+                            {% endifequal %}
                             <a href="" class="btn btn-danger">删除</a>
                         </td>
                     </tr>
@@ -53,9 +57,9 @@
             <ul class="pagination">
                 {% for i in page_range %}
                 <li class="paginate_button page-item">
-                    <a href="?keywords={{ keywords }}&page_num={{ i }}" class="page-link">
+                <a href="?keywords={{ keywords }}&page_num={{ i }}" class="page-link">
                         {{ i }}
-                    </a>
+                </a>
                 </li>
                 {% endfor %}
             </ul>

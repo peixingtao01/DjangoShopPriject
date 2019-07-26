@@ -34,6 +34,7 @@ class Goods(models.Model):
     goods_date = models.DateField(verbose_name='出厂日期')
     goods_safeDate = models.IntegerField(verbose_name='保质期')
     store_id = models.ManyToManyField(to=Store,verbose_name='商品店铺')
+    goods_under = models.IntegerField(verbose_name='商品状态',default=1)
 
 class GoodsImg(models.Model):
     img_address = models.ImageField(upload_to='shopfresh1/images',verbose_name='图片地址')
