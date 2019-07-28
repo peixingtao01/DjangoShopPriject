@@ -12,51 +12,52 @@
 		<span>></span>
 		<a href="#">商品详情</a>
 	</div>
-
+    {% if goods_data %}
 	<div class="goods_detail_con clearfix">
-		<div class="goods_detail_pic fl"><img src="/static/buyer/images/goods_detail.jpg"></div>
-
+		<div class="goods_detail_pic fl">
+            <img src="/static/{{ goods_data.goods_image }}" alt="{{ goods_data.goods_name }}" style="width:350px;height:350px;" name="goods_image"/>
+        </div>
 		<div class="goods_detail_list fr">
-			<h3>大兴大棚草莓</h3>
-			<p>草莓浆果柔软多汁，味美爽口，适合速冻保鲜贮藏。草莓速冻后，可以保持原有的色、香、味，既便于贮藏，又便于外销。</p>
+			<h3>{{ goods_data.goods_name }}</h3>
+			<p>{{ goods_data.goods_description }}</p>
 			<div class="prize_bar">
-				<span class="show_pirze">¥<em>16.80</em></span>
+				<span class="show_pirze">¥<em>{{ goods_data.goods_price }}</em></span>
 				<span class="show_unit">单  位：500g</span>
 			</div>
 			<div class="goods_num clearfix">
 				<div class="num_name fl">数 量：</div>
 				<div class="num_add fl">
-					<input type="text" class="num_show fl" value="1">
+					<input type="text" class="num_show fl" value="1" name="goods_carts">
 					<a href="javascript:;" class="add fr">+</a>
 					<a href="javascript:;" class="minus fr">-</a>
 				</div>
 			</div>
-			<div class="total">总价：<em>16.80元</em></div>
+			<div class="total">总价：<em>{{ goods_data.goods_price }}元</em></div>
 			<div class="operate_btn">
-				<a href="javascript:;" class="buy_btn">立即购买</a>
-				<a href="javascript:;" class="add_cart" id="add_cart">加入购物车</a>
+				<a href="/buyer/pay_order/?order_id={{ goods_data.id }}"  class="buy_btn">立即购买</a>
+				<a href="/buyer/cart_add/?add_id={{ goods_data.id }}" class="add_cart" id="add_cart">加入购物车</a>
 			</div>
 		</div>
 	</div>
-
+    {% endif %}
 	<div class="main_wrap clearfix">
-		<div class="l_wrap fl clearfix">
-			<div class="new_goods">
-				<h3>新品推荐</h3>
-				<ul>
-					<li>
-						<a href="#"><img src="/static/buyer/images/goods/goods001.jpg"></a>
-						<h4><a href="#">进口柠檬</a></h4>
-						<div class="prize">￥3.90</div>
-					</li>
-					<li>
-						<a href="#"><img src="/static/buyer/images/goods/goods002.jpg"></a>
-						<h4><a href="#">玫瑰香葡萄</a></h4>
-						<div class="prize">￥16.80</div>
-					</li>
-				</ul>
-			</div>
-		</div>
+{#		<div class="l_wrap fl clearfix">#}
+{#			<div class="new_goods">#}
+{#				<h3>新品推荐</h3>#}
+{#				<ul>#}
+{#					<li>#}
+{#						<a href="#"><img src="/static/buyer/images/goods/goods001.jpg"></a>#}
+{#						<h4><a href="#">进口柠檬</a></h4>#}
+{#						<div class="prize">￥3.90</div>#}
+{#					</li>#}
+{#					<li>#}
+{#						<a href="#"><img src="/static/buyer/images/goods/goods002.jpg"></a>#}
+{#						<h4><a href="#">玫瑰香葡萄</a></h4>#}
+{#						<div class="prize">￥16.80</div>#}
+{#					</li>#}
+{#				</ul>#}
+{#			</div>#}
+{#		</div>#}
 
 		<div class="r_wrap fr clearfix">
 			<ul class="detail_tab clearfix">
@@ -78,7 +79,7 @@
 {% endblock %}
 
 {% block script %}
-    <script type="text/javascript" src="/static/buyer/js/jquery-1.12.2.js"></script>
+    <script type="text/javascript" src="/static/buyer/js/jquery-1.12.4.min.js"></script>
 	<script type="text/javascript">
 		var $add_x = $('#add_cart').offset().top;
 		var $add_y = $('#add_cart').offset().left;

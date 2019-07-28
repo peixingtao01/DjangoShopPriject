@@ -42,7 +42,7 @@ class Goods(models.Model):
     store_id = models.ManyToManyField(to=Store,verbose_name='商品店铺')
     goods_under = models.IntegerField(verbose_name='商品状态',default=1)
     goods_type = models.ForeignKey(to=GoodsType,on_delete=models.CASCADE,verbose_name='商品类型')
-
+# 货物与商店是多对多的，那么如何在商店注销时，让对应的多对多表也删除掉?
 class GoodsImg(models.Model):
     img_address = models.ImageField(upload_to='shopfresh1/images',verbose_name='图片地址')
     img_description = models.TextField(max_length=32,verbose_name='图片描述')
