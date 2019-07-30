@@ -7,58 +7,68 @@
 {% block content %}
   	<div class="breadcrumb">
 		<a href="/buyer/index/">全部分类</a>
-		<span>></span>
+		<span>&gt;</span>
 		<a href="#">新鲜水果</a>
-		<span>></span>
+		<span>&gt;</span>
 		<a href="#">商品详情</a>
 	</div>
     {% if goods_data %}
+        <form method="post" action="/buyer/place_order/">
+{#        这里的提交地址很重要#}
+        {% csrf_token %}
+
 	<div class="goods_detail_con clearfix">
 		<div class="goods_detail_pic fl">
             <img src="/static/{{ goods_data.goods_image }}" alt="{{ goods_data.goods_name }}" style="width:350px;height:350px;" name="goods_image"/>
         </div>
 		<div class="goods_detail_list fr">
 			<h3>{{ goods_data.goods_name }}</h3>
-			<p>{{ goods_data.goods_description }}</p>
+			<p>{{ goods_data.goods_description|safe }}</p>
 			<div class="prize_bar">
-				<span class="show_pirze">¥<em>{{ goods_data.goods_price }}</em></span>
+				<span class="show_pirze">¥<em id="danjia">{{ goods_data.goods_price }}</em></span>
 				<span class="show_unit">单  位：500g</span>
 			</div>
 			<div class="goods_num clearfix">
 				<div class="num_name fl">数 量：</div>
 				<div class="num_add fl">
-					<input type="text" class="num_show fl" value="1" name="goods_carts">
-					<a href="javascript:;" class="add fr">+</a>
-					<a href="javascript:;" class="minus fr">-</a>
+					<input type="text" class="num_show fl" value="1" id="goods_carts" name="shuliang"/>
+                    <input type="hidden" id="goods_id" name="goods_id" value="{{ goods_data.id }}" />
+					<a  onclick="goods_count('add')" class="add fr">+</a>
+					<a  onclick="goods_count('minus')" class="minus fr">-</a>
 				</div>
 			</div>
-			<div class="total">总价：<em>{{ goods_data.goods_price }}元</em></div>
+			<div class="total">总价：<em id="price">{{ goods_data.goods_price }}</em><em>元</em></div>
 			<div class="operate_btn">
-				<a href="/buyer/pay_order/?order_id={{ goods_data.id }}"  class="buy_btn">立即购买</a>
-				<a href="/buyer/cart_add/?add_id={{ goods_data.id }}" class="add_cart" id="add_cart">加入购物车</a>
+{#				<a href="/buyer/pay_order/?order_id={{ goods_data.id }}"  class="buy_btn">立即购买</a>#}
+                <input type="submit" class="buy_btn" value="立即购买"/>
+{#				<a href="/buyer/cart_add/?add_id={{ goods_data.id }}" class="add_cart" id="add_cart">加入购物车</a>#}
+				<a href="#" class="add_cart" id="add_cart">加入购物车</a>
+                {#  当a标签有ajax时，会有两次触发条件，一个是href，另一个是点击事件  #}
 			</div>
 		</div>
 	</div>
     {% endif %}
+    </form>
+{#  ----------------------------------------------------------------------------------------------  #}
 	<div class="main_wrap clearfix">
-{#		<div class="l_wrap fl clearfix">#}
-{#			<div class="new_goods">#}
-{#				<h3>新品推荐</h3>#}
-{#				<ul>#}
-{#					<li>#}
-{#						<a href="#"><img src="/static/buyer/images/goods/goods001.jpg"></a>#}
-{#						<h4><a href="#">进口柠檬</a></h4>#}
-{#						<div class="prize">￥3.90</div>#}
-{#					</li>#}
-{#					<li>#}
-{#						<a href="#"><img src="/static/buyer/images/goods/goods002.jpg"></a>#}
-{#						<h4><a href="#">玫瑰香葡萄</a></h4>#}
-{#						<div class="prize">￥16.80</div>#}
-{#					</li>#}
-{#				</ul>#}
-{#			</div>#}
-{#		</div>#}
-
+		<div class="l_wrap fl clearfix">
+			<div class="new_goods">
+				<h3>新品推荐</h3>
+				<ul>
+					<li>
+						<a href="#"><img src="/static/buyer/images/goods/goods001.jpg"></a>
+						<h4><a href="#">进口柠檬</a></h4>
+						<div class="prize">￥3.90</div>
+					</li>
+					<li>
+						<a href="#"><img src="/static/buyer/images/goods/goods002.jpg"></a>
+						<h4><a href="#">玫瑰香葡萄</a></h4>
+						<div class="prize">￥16.80</div>
+					</li>
+				</ul>
+			</div>
+		</div>
+{#  ----------------------------------------------------------------------------------------------  #}
 		<div class="r_wrap fr clearfix">
 			<ul class="detail_tab clearfix">
 				<li class="active">商品介绍</li>
@@ -68,7 +78,7 @@
 			<div class="tab_content">
 				<dl>
 					<dt>商品详情：</dt>
-					<dd>草莓采摘园位于北京大兴区 庞各庄镇四各庄村 ，每年1月-6月面向北京以及周围城市提供新鲜草莓采摘和精品礼盒装草莓，草莓品种多样丰富，个大香甜。所有草莓均严格按照有机标准培育，不使用任何化肥和农药。草莓在采摘期间免洗可以直接食用。欢迎喜欢草莓的市民前来采摘，也欢迎各大单位选购精品有机草莓礼盒，有机草莓礼盒是亲朋馈赠、福利送礼的最佳选择。 </dd>
+					<dd>{{ goods_data.goods_description|safe }}</dd>
 				</dl>
 			</div>
 
@@ -87,7 +97,7 @@
 		var $to_x = $('#show_count').offset().top;
 		var $to_y = $('#show_count').offset().left;
 
-		$(".add_jump").css({'left':$add_y+80,'top':$add_x+10,'display':'block'})
+		$(".add_jump").css({'left':$add_y+80,'top':$add_x+10,'display':'block'});
 		$('#add_cart').click(function(){
 			$(".add_jump").stop().animate({
 				'left': $to_y+7,
@@ -101,4 +111,69 @@
 		})
 	</script>
 
+    {#商品增加#}
+    <script>
+        function goods_count(shangpinshu) {
+            var value = $('#goods_carts').val();
+            if(shangpinshu == 'add'){
+                $('#goods_carts').val(++value);
+            }else {
+                if(value <= 1){
+                    $('#goods_carts').val(1);
+                }else {
+                    $('#goods_carts').val(--value);
+                }
+            }
+            <!--
+            var url = '/buyer/goods_detail/';
+            var haha =$.ajax({
+                url:url,
+                type:"POST",
+                data:goods_carts,
+                success:function (data) {
+                    ++data
+                },
+                error:function (data) {
+                    if(data<=1){
+                        data =1
+                    }else {
+                        --data
+                    }
+                }
+            });
+            -->
+            var price =$('#danjia').text();
+            var priceF = parseFloat(price);
+            {#  var price = #}
+            var pricecount = value * priceF;
+            $('#price').text(pricecount)
+        }
+    </script>
+    <script>
+        $('#add_cart').click(
+            function () {
+                var count = $('#goods_carts').val();
+                var goods_id = $('#goods_id').val();
+                var sentData = {
+                    'count':count,
+                    'goods_id':goods_id,
+                    'csrfmiddlewaretoken':'{{ csrf_token }}'
+                };
+                console.log(count,sentData,goods_id);
+                var url = '/buyer/cart_add/';//这是要传给谁
+                $.ajax({
+                    url:url,
+                    type:'post',
+                    data :sentData,
+                    success:function (data) {
+{#                        console.log(data)#}
+                        alert(data.data)
+                    },
+                    error:function (data) {
+                        console.log(data)
+                    }
+                })
+            }
+        )
+    </script>
 {% endblock %}

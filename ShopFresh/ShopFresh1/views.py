@@ -118,7 +118,7 @@ def add_goods(request):
         goods_description = request.POST.get('goods_description')
         goods_date = request.POST.get('goods_date')
         goods_safeDate = request.POST.get('goods_safeDate')
-        # store_id = request.POST.get('store_id')
+        store_id = request.POST.get('store_id')#过得店铺id
         goods_image = request.FILES.get('goods_image')
 
         goods_store = request.COOKIES.get('has_store')
@@ -138,14 +138,15 @@ def add_goods(request):
         goods.goods_date = goods_date
         goods.goods_safeDate = goods_safeDate
         goods.goods_image = goods_image
+        goods.store_id =Store.objects.get(id = int(store_id))#添加了商品店铺的id
 
         goods.save()#对应表有多对多时，保存两次
         # 保存多对多数据
-        store_idint = int(goods_store)
-        goods.store_id.add(
-            Store.objects.get(user_id= store_idint)
-        )
-        goods.save()
+        # store_idint = int(goods_store)
+        # goods.store_id.add(
+        #     Store.objects.get(user_id= store_idint)
+        # )
+        # goods.save()
     return render(request,'ShopFresh1/add_goods.html',locals())
 
 def list_goods(request,state):
@@ -228,7 +229,7 @@ def set_goods(request,state):
     referer = request.META.get('HTTP_REFERER')
     if id:
         goods = Goods.objects.filter(id = id).first()
-        if state=='delete':
+        if state == 'delete':
             goods.delete()
         else:
             goods.goods_under = state_num

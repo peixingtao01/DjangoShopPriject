@@ -36,7 +36,7 @@ def register(request):
         return HttpResponseRedirect('/buyer/login/')
     return render(request,'Buyer/register.html')
 
-
+# 登录
 def login(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -55,6 +55,7 @@ def login(request):
                     return response
     return render(request,'Buyer/login.html')
 
+# 退出
 def logout(request):
     response = HttpResponseRedirect('/buyer/index/')
     for key in request.COOKIES:
@@ -62,7 +63,7 @@ def logout(request):
     del request.session['username']
     return response
 
-
+#首页
 @LoginValid
 def index(request):
     result_list = []
@@ -85,7 +86,7 @@ def index(request):
     # print(result_list)
     return render(request,'Buyer/index.html',locals())
 
-
+# 商品列表页
 @LoginValid
 def goods_list(request):
     goodsList = []
@@ -97,6 +98,7 @@ def goods_list(request):
         # 找到所有的商品
     return render(request,'buyer/goods_list.html',locals())
 
+# 商品详情页
 @LoginValid
 def goods_detail(request):
     # 这个页面的路由跳转不过去
@@ -111,12 +113,72 @@ def goods_detail(request):
 
 # 支付函数
 import time
+def Order_Time(user_id,goods_id,store_id):
+    times = time.strftime('%Y%m%d%H%S%M',time.localtime())
+    return times+user_id+goods_id+store_id
+
+# 提交订单
+def place_order(request):
+    if request.method =='POST':
+        user_id = request.COOKIES.get('user_id')
+        goods_image = request.POST.get('goods_image')
+        goods_id = request.POST.get('goods_id')
+        count = int(request.POST.get('shuliang'))
+
+        goods = Goods.objects.get(id = goods_id)
+
+        store_id = goods.store_id.id#还可以这样反向查询
+        price = goods.goods_price
+
+        user_id1 = int(user_id)
+
+        #---------------------------------------------
+        recvers = Buyer.objects.get(id=user_id).username
+        address = Address.objects.get(recver = recvers,buyer_id=user_id).address
+        print(address)
+        # --------------------------------------------
+
+        order = Order()
+        order.order_id = Order_Time(str(user_id),str(goods_id),str(store_id))#订单编号
+        order.goods_count = count#数量
+        order.order_user = Buyer.objects.get(id = user_id)#订单人
+        order.order_price = count * price#总价
+        order.order_time = int(time.time())#订单时间
+
+        order.order_address = Address.objects.get(recver=recvers,buyer_id=user_id)#地址!!!!!十分重要
+        order.save()
+
+        order_detail = OrderDetail()
+        order_detail.order_id = order#!!!!这个是什么
+        order_detail.goods_id = goods_id
+        order_detail.goods_name = goods.goods_name
+        order_detail.goods_price = goods.goods_price
+        order_detail.goods_number = count
+        order_detail.goods_total = count*goods.goods_price
+        order_detail.goods_store = store_id
+        order_detail.goods_image = goods.goods_image
+        order_detail.goods_order_time = order.order_time
+        order_detail.save()
+
+        detail = [order_detail]
+    else:
+        order_id = request.GET.get('order_id')
+        if order_id:
+            order = Order.objects.get(id = order_id)
+            detail = order.orderdetail_set.all()
+            return render(request,'buyer/place_order.html',locals())
+        else:
+            return HttpResponse('非法请求')
+
+    return render(request,'buyer/place_order.html',locals())
+
+
 from alipay import AliPay
 def pay_order(request):
+    user_id = request.COOKIES.get('user_id')
     money = request.GET.get('money')
     order_id = request.GET.get('order_id')
-    moretime = int(time.time())
-    order_ids = str(moretime) + order_id
+
     # 如果用时间戳，当是否页面跳转的时间会发生改变
     alipay_public_key_string = """-----BEGIN PUBLIC KEY-----
     MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsUz6B1oA0tJkDIg3nvKbUggu3FswnBQ6e5kj1MSxrbAKJF1s2+6fK0tpBD5VWaRCyKCf73ulC0BQv2WFKRxQ+ud3r08JuKr0a6u2aBnua7+Zbw34kbqoNYJ0LZitGdJQnotbDc2GgyxOO2Bd3WjvInB4otjXS2y3jNDQRh2fV2Rml4C5RcTIsbeivcvNw3/pvNTP6x45neD1JpPxeFvgT/Y9aj/Xytw52mYLycblZ++fto48zzCSrxKzotyJR5b5shFdOjheTKb1SMGAiXKh03MmRjMqwR8iNn/7j9oreCykzxKcSewrshXpnjslBqZDlpWoUGJU09kfhMiO1espKwIDAQAB
@@ -135,7 +197,7 @@ def pay_order(request):
     )
     # 网页支付请求
     order_string = alipay.api_alipay_trade_page_pay(
-        out_trade_no=order_ids,  # 订单号,
+        out_trade_no=order_id,  # 订单号,
         total_amount=str(money),  # 支付金额
         subject='生鲜交易',
         return_url='http://127.0.0.1/buyer/pay_result/',
@@ -146,46 +208,163 @@ def pay_order(request):
     #     支付宝支付遇到了问题，订单显示失败
 def pay_result(request):
 
-    return HttpResponse('支付成功')
-
+    # return HttpResponse('支付成功')
+    return render(request,'buyer/pay_result.html',locals())
 # 加入购物车
+# @LoginValid
+# def cart_add(request):
+#     user_id = request.COOKIES.get('user_id')
+#     cart_add_id = request.GET.get('add_id')
+#     # print(user_id,type(user_id))
+#     # print(cart_add_id,type(cart_add_id))
+#     goods = Goods.objects.filter(id=cart_add_id).first()
+#     goods_image1 = goods.goods_image#图片
+#     goods_name1 = goods.goods_name#名字
+#     goods_price1 = goods.goods_price#价格
+#     goods_carts1 = goods.goods_number#数量
+#     goods_under1 = goods.goods_under
+#     addtimes = time.time()
+#     addtimes = int(addtimes)
+#     user_id = int(user_id)
+#     cart_add_id = int(cart_add_id)
+#     cart_db = Cart()
+#     cart_db.buyer_id_id =user_id
+#     # cart_db.user_id = user_id#保存买家信息
+#     cart_db.goods_id = cart_add_id#保存商品id
+#     cart_db.goods_name = goods_name1#商品名
+#     cart_db.goods_price = goods_price1#商品价格
+#     cart_db.goods_image = goods_image1#图片
+#     cart_db.goods_carts = goods_carts1#库存
+#     cart_db.goods_addtime = addtimes#添加时间
+#     cart_add.goods_under = goods_under1#商品状态
+#     cart_db.save()
+#     return render(request,'buyer/goods_detail.html',locals())
+
+from django.http import JsonResponse
 @LoginValid
 def cart_add(request):
+    #ajax加入购物车
     user_id = request.COOKIES.get('user_id')
-    cart_add_id = request.GET.get('add_id')
-    # print(user_id,type(user_id))
-    # print(cart_add_id,type(cart_add_id))
-    goods = Goods.objects.filter(id=cart_add_id).first()
-    goods_image1 = goods.goods_image#图片
-    goods_name1 = goods.goods_name#名字
-    goods_price1 = goods.goods_price#价格
-    goods_carts1 = goods.goods_number#数量
-    goods_under1 = goods.goods_under
-    addtimes = time.time()
-    addtimes = int(addtimes)
-    user_id = int(user_id)
-    cart_add_id = int(cart_add_id)
-    cart_db = Cart()
-    cart_db.buyer_id_id =user_id
-    # cart_db.user_id = user_id#保存买家信息
-    cart_db.goods_id = cart_add_id#保存商品id
-    cart_db.goods_name = goods_name1#商品名
-    cart_db.goods_price = goods_price1#商品价格
-    cart_db.goods_image = goods_image1#图片
-    cart_db.goods_carts = goods_carts1#库存
-    cart_db.goods_addtime = addtimes#添加时间
-    cart_add.goods_under = goods_under1#商品状态
-    cart_db.save()
-    return render(request,'buyer/goods_detail.html',locals())
+    result = {'state':'error','data':''}
+    if request.method == "POST":
+        count = int(request.POST.get('count'))
+        # print(count)
+        goods_id = request.POST.get('goods_id')
+        # print(goods_id)
+        goods = Goods.objects.get(id = int(goods_id))
+
+        cart_db = Cart()
+        cart_db.goods_name = goods.goods_name
+        cart_db.goods_price = goods.goods_price
+        cart_db.goods_id = goods.id
+        cart_db.goods_image = goods.goods_image
+        cart_db.goods_under = goods.goods_under
+        cart_db.goods_addtime = int(time.time())
+        cart_db.goods_carts = count
+        cart_db.buyer_id_id = int(user_id)
+        cart_db.goods_total = goods.goods_price*count
+        cart_db.save()
+        result['state'] = 'success'
+        result['data'] = '商品添加成功'
+    else:
+        result['data'] = '请求失败'
+    return JsonResponse(result)
 
 # 购物车
-def cart(request):
+# def cart(request):
+#     user_id = request.COOKIES.get('user_id')
+#     goods = Cart.objects.filter(buyer_id=user_id).order_by('-id')#引号加上符号就是降序排序
+#     # goods = Cart.objects.filter( b= user_id).first()#查出这个货物
+#     return render(request,'buyer/cart.html',locals())
+def cart(request):#另一种购物车
     user_id = request.COOKIES.get('user_id')
-    goods = Cart.objects.filter(buyer_id=user_id)
-    # goods = Cart.objects.filter( b= user_id).first()#查出这个货物
+    goods = Cart.objects.filter(buyer_id = user_id)
+    if request.method =='POST':
+        post_data = request.POST#post过来的是个字典
+        cart_data = []
+        for k,v in post_data.items():
+            if k.startswith('goods_'):
+#                 以什么东西开头a
+                cart_data.append(Cart.objects.get(id = int(v)))
+        goods_count = len(cart_data)
+        goods_total = sum([int(i.goods_total) for i in cart_data])#这个有问题
+        times = int(time.time())
+        order = Order()
+        order.order_id = Order_Time(user_id,str(goods_count),str(times))
+
+        print(user_id)#1
+        order.goods_count = goods_count
+        order.order_user = Buyer.objects.get(id = user_id)
+        print(Address.objects.filter(buyer_id=int(user_id)).first())
+        order.order_address = Address.objects.filter(buyer_id=user_id).first()
+        order.order_price = goods_total
+        order.goods_under = 1
+        order.order_time = int(time.time())
+        order.save()#时间没写
+
+        for detail in cart_data:
+            order_detail = OrderDetail()
+            order_detail.order_id = order#一条订单数据
+            order_detail.goods_id = detail.goods_id
+            order_detail.goods_name = detail.goods_name
+            order_detail.goods_price = detail.goods_price
+            order_detail.goods_number = detail.goods_number
+            order_detail.goods_store = detail.store_id.id
+            order_detail.goods_total = detail.goods_total
+            order_detail.goods_image = detail.goods_image
+            order_detail.goods_order_time = detail.goods_addtime
+            order_detail.save()
+        url = '/buyer/place_order/?order_id=%s'%order.id
+        return HttpResponseRedirect(url)
     return render(request,'buyer/cart.html',locals())
 
 
+# 删除购物车内容
+def cart_del(request):
+    user_id = request.COOKIES.get('user_id')
+    referer = request.META.get('HTTP_REFERER')
+    user_id = int(user_id)
+    idya = request.GET.get('goods_idya')
+    # print(idya,'1!')
+    id = int(idya)
+    good = Cart.objects.filter(id=id,buyer_id=user_id).first()
+    good.delete()
+
+    return HttpResponseRedirect(referer)
+
+# 收货地址添加
+def user_site(request):
+    if request.method == 'POST':
+        user_id = request.COOKIES.get('user_id')
+        recver_name = request.POST.get('recver_name')
+        recver_address = request.POST.get('recver_address')
+        post_num = request.POST.get('post_num')
+        recver_num = request.POST.get('recver_num')
+        address = Address()
+        if recver_name:
+            address.recver = recver_name
+            # print(type(user_id))
+            user_id1 = int(user_id)
+            # print(type(user_id1))
+            address.buyer_id = Buyer.objects.get(id = user_id1)
+            # 存入从表外键的数据，必须是主表的全部数据，不过是以id为条件而已
+            address.save()
+        if recver_address:
+            address.address = recver_address
+            address.save()
+        if post_num:
+            address.post_num = post_num
+            address.save()
+        if recver_num:
+            address.recver_num = recver_num
+            address.save()
+
+        # 因为是提交到本地址，所以就不用写action
+    return render(request,'buyer/user_site.html',locals())
+
+
+
+# 得到名称价格数量,总价
 
 
 

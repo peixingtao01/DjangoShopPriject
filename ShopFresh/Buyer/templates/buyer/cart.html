@@ -14,9 +14,11 @@
 		<li class="col05">小计</li>
 		<li class="col06">操作</li>
 	</ul>
+    <form  method="post">
+    {% csrf_token %}
     {% for goods1 in goods %}
 	<ul class="cart_list_td clearfix">
-		<li class="col01"><input type="checkbox" name="" checked></li>
+		<li class="col01"><input type="checkbox" checked value="{{ goods1.id }}" name= "goods_{{ goods1.id }}" class="goods_check"/></li>
 		<li class="col02"><img src="/static/{{ goods1.goods_image }}" alt="{{ goods1.goods_name }}"/></li>
 		<li class="col03">{{ goods1.goods_name }}<br><em>{{ goods1.goods_price }}元/500g</em></li>
 		<li class="col04">500g</li>
@@ -24,20 +26,47 @@
 		<li class="col06">
 			<div class="num_add">
 				<a href="javascript:;" class="add fl">+</a>
-				<input type="text" class="num_show fl" value="1">
+				<input type="text" class="num_show fl" value="{{ goods1.goods_number }}">
 				<a href="javascript:;" class="minus fl">-</a>
 			</div>
 		</li>
-		<li class="col07">{{ goods1.goods_price }}元</li>
-		<li class="col08"><a href="javascript:;">删除</a></li>
+		<li class="col07">{{ goods1.goods_total }}元</li>
+		<li class="col08"><a href="/buyer/cart_del/?goods_idya={{ goods1.id }}">删除</a></li>
 	</ul>
     {% endfor %}
 	<ul class="settlements">
-		<li class="col01"><input type="checkbox" name="" checked=""></li>
+		<li class="col01"><input type="checkbox" name="" checked="" id="allBox"/></li>
 		<li class="col02">全选</li>
 		<li class="col03">合计(不含运费)：<span>¥</span><em>42.60</em><br>共计<b>2</b>件商品</li>
-		<li class="col04"><a href="place_order.html">去结算</a></li>
+{#		<li class="col04"><a href="place_order.html">去结算</a></li>#}
+		<li class="col04"><input type="submit" value="去结算" /></li>
 	</ul>
+    </form>
 
-
+{% endblock %}
+{% block script %}
+    <script src="/static/buyer/js/jquery-1.12.4.min.js"></script>
+    <script>
+        $('#allBox').click(
+          function (){
+            if(this.checked){
+                $('.goods_check').prop('checked',true);
+            {#  选中的一般就是TRUE或flase两种  #}
+            }else {
+                $('.goods_check').prop('checked',false)
+            }
+        }
+        );
+        $('.goods_check').each(
+            function () {
+                $(this).click(
+                    function () {
+                        if(!this.checked){
+                            $('#allBox').prop('checked',false)
+                        }
+                    }
+                )
+            }
+        )
+    </script>
 {% endblock %}
