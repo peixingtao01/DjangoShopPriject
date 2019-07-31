@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'ShopFresh1',
     'Buyer',
     'ckeditor',
-    'ckeditor_uploader'
+    'ckeditor_uploader',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
@@ -132,3 +133,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR,'static')
 CKEDITOR_UPLOAD_PATH = 'static/upload'
 CKEDITOR_IMAGE_BACKEND = 'pillow'
 # STATIC_ROOT = os.path.join(BASE_DIR,'static')
+
+# 这是api的东西
+REST_FRAMEWORK ={
+    "DEFAULT_PERMISSION_CLASSES":[
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ],
+#     分页装置
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE':3
+}

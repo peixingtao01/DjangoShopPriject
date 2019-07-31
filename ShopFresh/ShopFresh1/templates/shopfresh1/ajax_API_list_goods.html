@@ -1,0 +1,103 @@
+{% extends 'shopfresh1/base.html' %}
+
+{% block title %}
+    商品列表
+{% endblock %}
+
+{% block content %}
+{% verbatim %}
+        <div  id="goods">
+
+
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>商品名称</th>
+                    <th>商品价格</th>
+                    <th>商品数量</th>
+                    <th>出厂日期</th>
+                    <th>保质期</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+
+
+            <tbody>
+            <tr v-for="goods in goods_list">
+                <td><a href="#">{{ goods.goods_name }}</a></td>
+                <td>{{ goods.goods_price }}</td>
+                <td>{{ goods.goods_number }}</td>
+                <td>{{ goods.goods_date }}</td>
+                <td>{{ goods.goods_safeDate }}</td>
+                <td>
+                    <a href="#" class="btn btn-warning" style="">下架</a>
+                </td>
+            </tr>
+            </tbody>
+
+        </table>
+            <!--分页-->
+            <ul class="pagination">
+
+                <li class="paginate_button page-item" v-for="p in page_range">
+                <a href="#" v-on:click="get_page_data(p)" class="page-link">
+                        {{ p }}
+                </a>
+                </li>
+
+            </ul>
+
+        </div>
+
+{% endverbatim %}
+{% endblock %}
+{% block script %}
+    <script src="/static/shopfresh1/js/vue.min.js"></script>
+    <script src="/static/shopfresh1/js/vue-resource.js"></script>
+    <script>
+        Vue.use(VueResource);
+        var vue = new Vue(
+            {
+                el:'#goods',
+                data:{
+                    goods_list:[],
+                    page_range:[]
+                },
+                created:function () {
+                    this.$http.get('/APIgoods/').then(
+                        function (data) {
+                            this.goods_list = data.data.results;
+                            console.log(this.goods_list);
+                            page_number = Math.ceil(data.data.count/3);
+                            var page_range =  [...new Array(page_number).keys()];
+                            console.log(page_range);
+                            this.page_range = page_range
+
+                        },
+                        function (error) {
+                            console.log(error)
+                        }
+                    )
+                },
+                methods:{
+                    get_page_data:function (page) {
+                        this.$http.get('/APIgoods/?page='+page).then(
+                            function (data) {
+                                console.log('@!!!!!!!!!!!!');
+                                this.goods_list = data.data.results;
+                                page_number = Math.ceil(data.data.count/3);
+                                var page_range = [...new Array(page_number).keys()];
+                                console.log(page_range);
+                                this.page_range = page_range
+
+                            },
+                            function (error) {
+                                console.log(error)
+                            }
+                        )
+                    }
+                }
+            }
+        )
+    </script>
+{% endblock %}

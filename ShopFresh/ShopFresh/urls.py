@@ -23,6 +23,19 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path,include,re_path
 from Buyer.views import index
+
+# -------------------------------------------------------API
+
+# from rest_framework import routers,serializers,viewsets
+from rest_framework import routers
+
+from ShopFresh1.views import UserViewSet,TypeViewSet
+router = routers.DefaultRouter()#声明一个默认的路由注册器
+router.register(r'goods',UserViewSet)
+router.register(r'goodsType',TypeViewSet)
+
+
+# -------------------------------------------------------API
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('store/',include('ShopFresh1.urls')),
@@ -31,4 +44,9 @@ urlpatterns = [
 ]
 urlpatterns+=[
     re_path(r'^$',index),
+]
+
+urlpatterns+=[
+    re_path('^API',include(router.urls)),#@声明一个默认的路由注册器
+    # re_path('^api-auth',include('rest-framework.urls')),
 ]

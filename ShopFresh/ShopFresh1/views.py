@@ -244,7 +244,24 @@ def logout(request):
     return response
 
 
-#
+# API
+from rest_framework import viewsets
+from ShopFresh1.serializers import UserSerializer,GoodsTypeSerializer
+class UserViewSet(viewsets.ModelViewSet):
+    # 返回具体的查询内容
+    queryset = Goods.objects.all()
+    serializer_class = UserSerializer
+
+class TypeViewSet(viewsets.ModelViewSet):
+    # 返回具体查询的内容
+    queryset = GoodsType.objects.all()
+    serializer_class = GoodsTypeSerializer
+
+def ajax_api(request):
+    return render(request,'shopfresh1/ajax_API_list_goods.html',locals())
+
+
+        #
 # def page404(request):
 #     return render(request,'ShopFresh1/404.html')
 #

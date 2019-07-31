@@ -29,3 +29,6 @@ urlpatterns+=[
     re_path(r'set_goods/(?P<state>\w+)',set_goods),
 ]
 
+urlpatterns+=[
+    path(r'ajax_api/',ajax_api),
+]
