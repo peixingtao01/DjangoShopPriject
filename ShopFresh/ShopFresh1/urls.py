@@ -14,7 +14,6 @@ urlpatterns =[
     # path('charts/',charts),
     # path('table/',tables),
     # path('utilltiesanimation/',utilltiesanimation),
-
 ]
 urlpatterns+=[
     path('register_store/',register_store),
@@ -31,4 +30,5 @@ urlpatterns+=[
 
 urlpatterns+=[
     path(r'ajax_api/',ajax_api),
+    path('get_add/',get_add),
 ]

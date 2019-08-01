@@ -247,10 +247,14 @@ def logout(request):
 # API
 from rest_framework import viewsets
 from ShopFresh1.serializers import UserSerializer,GoodsTypeSerializer
+from ShopFresh1.serializers import *
+from django_filters.rest_framework import DjangoFilterBackend #过滤器
 class UserViewSet(viewsets.ModelViewSet):
     # 返回具体的查询内容
     queryset = Goods.objects.all()
     serializer_class = UserSerializer
+    filter_backends = [DjangoFilterBackend]#采用哪个过滤器
+    filterset_fields = ['goods_name','goods_price']#需要查询的字段
 
 class TypeViewSet(viewsets.ModelViewSet):
     # 返回具体查询的内容
@@ -260,6 +264,17 @@ class TypeViewSet(viewsets.ModelViewSet):
 def ajax_api(request):
     return render(request,'shopfresh1/ajax_API_list_goods.html',locals())
 
+from django.core.mail import send_mail
+def sendMail(request):
+    send_mail('邮件主题','邮件内容','from_email',['to_email'],fail_silently=False)
+
+
+
+from CeleryTask.tasks import add
+from django.http import JsonResponse
+def get_add(requset):
+    add.delay(2,3)
+    return JsonResponse({'statue':200})
 
         #
 # def page404(request):

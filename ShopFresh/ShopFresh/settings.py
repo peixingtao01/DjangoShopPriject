@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'Buyer',
     'ckeditor',
     'ckeditor_uploader',
-    'rest_framework'
+    'rest_framework',
+    'djcelery',#芹菜
 ]
 
 MIDDLEWARE = [
@@ -127,7 +128,7 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR,'static'),
 )
 
-MEDIA_URL = '/media/'
+MEDIA_URL = '/media/'#媒体文件
 MEDIA_ROOT = os.path.join(BASE_DIR,'static')
 
 CKEDITOR_UPLOAD_PATH = 'static/upload'
@@ -138,8 +139,49 @@ CKEDITOR_IMAGE_BACKEND = 'pillow'
 REST_FRAMEWORK ={
     "DEFAULT_PERMISSION_CLASSES":[
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ],
+    ],#权限
 #     分页装置
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE':3
+    'PAGE_SIZE':1,
+    # 重新搞一下接口,自定义返回内容
+    "DEFAULT_RENDERER_CLASSES":(
+        'utils.rendererresponse.customrenderer',
+    ),
+
+    # django-filter自带的查询过滤器
+    'DEFAULT_FILTER_BACKENDS':(
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ),
 }
+
+# 邮件服务器
+EMAIL_BACKEND ='django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = False
+EMAIL_HOST = 'smtp.163.com'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = '13906445972@163.com'
+EMAIL_HOST_PASSWORD = 'duoyan3wei'
+DEFAULT_FROM_EMAIL = '13906445972@163.com'
+
+
+# 配置celery,芹菜
+import djcelery #导入包
+djcelery.setup_loader()
+BROKER_URL = 'redis://127.0.0.1:6379/1'#放入数据库中
+CELERY_IMPORTS = ('CeleryTask.tasks')#具体的任务文件
+CELERY_TIMEZONE = 'Asia/Shanghai'#东八区
+CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'#celery处理器
+
+# celery定时器
+from celery.schedules import crontab
+from celery.schedules import timedelta
+
+CELERYBEAT_SCHEDULE ={
+    #定时器策略
+    u'测试定时器1':{
+        'task':'celeryTask.tasks.taskExample',
+        'schedule':timedelta(seconds=30),
+        'args':(),
+    },
+}
+# 使用celery与Redis，必须先启动Redis
