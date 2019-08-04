@@ -1,8 +1,8 @@
 import smtplib
 from email.mime.text import MIMEText
 
-subject = '秒嘀云200条免费'
-content = '刚看到秒嘀云据说两百条免费,https://sms.miaodiyun.com/index.html'
+subject = '邮件标题'
+content = '邮件内容'
 sender = '13906445972@163.com'
 recver = '1307128051@qq.com'
 password = 'duoyan3wei'#客户端授权码

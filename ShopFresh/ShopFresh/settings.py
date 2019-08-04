@@ -37,22 +37,23 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'ShopFresh1',
-    'Buyer',
-    'ckeditor',
-    'ckeditor_uploader',
-    'rest_framework',
+    'ShopFresh1',#自己app
+    'Buyer',#自己app
+    'ckeditor',#富文本
+    'ckeditor_uploader',#富文本
+    'rest_framework',#api
     'djcelery',#芹菜
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
+    'django.middleware.security.SecurityMiddleware',#中间件
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'ShopFresh.middleware.MiddlewareTest',
 ]
 
 ROOT_URLCONF = 'ShopFresh.urls'
@@ -132,7 +133,7 @@ MEDIA_URL = '/media/'#媒体文件
 MEDIA_ROOT = os.path.join(BASE_DIR,'static')
 
 CKEDITOR_UPLOAD_PATH = 'static/upload'
-CKEDITOR_IMAGE_BACKEND = 'pillow'
+CKEDITOR_IMAGE_BACKEND = 'pillow'#富媒体文件
 # STATIC_ROOT = os.path.join(BASE_DIR,'static')
 
 # 这是api的东西
@@ -171,17 +172,20 @@ BROKER_URL = 'redis://127.0.0.1:6379/1'#放入数据库中
 CELERY_IMPORTS = ('CeleryTask.tasks')#具体的任务文件
 CELERY_TIMEZONE = 'Asia/Shanghai'#东八区
 CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'#celery处理器
-
 # celery定时器
 from celery.schedules import crontab
 from celery.schedules import timedelta
-
 CELERYBEAT_SCHEDULE ={
     #定时器策略
     u'测试定时器1':{
-        'task':'celeryTask.tasks.taskExample',
+        'task':'CeleryTask.tasks.taskExample',
         'schedule':timedelta(seconds=30),
         'args':(),
+    },
+    u'今天debug了吗':{
+        'task':'CeleryTask.tasks.DingTalk',
+        'schedule':timedelta(seconds=5),
+        'args':()
     },
 }
 # 使用celery与Redis，必须先启动Redis
