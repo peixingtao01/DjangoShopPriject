@@ -1,7 +1,7 @@
 #
 import hashlib
 from django.core.paginator import Paginator#分页的包
-from django.shortcuts import render,HttpResponseRedirect
+from django.shortcuts import render,HttpResponseRedirect,HttpResponse
 
 from ShopFresh1.models import *
 
@@ -275,6 +275,13 @@ from django.http import JsonResponse
 def get_add(requset):
     add.delay(2,3)
     return JsonResponse({'statue':200})
+
+
+from django.views.decorators.cache import cache_page
+@cache_page(60*15)
+def small_white_views(request):
+    rep = HttpResponse('i am rep')
+    return rep
 
         #
 # def page404(request):

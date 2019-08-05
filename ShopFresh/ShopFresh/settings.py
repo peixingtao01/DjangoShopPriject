@@ -46,6 +46,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'django.middleware.cache.UpdateCacheMiddleware',#全栈
     'django.middleware.security.SecurityMiddleware',#中间件
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -54,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'ShopFresh.middleware.MiddlewareTest',
+    'django.middleware.cache.FetchFromCacheMiddleware',#全栈
 ]
 
 ROOT_URLCONF = 'ShopFresh.urls'
@@ -189,3 +191,44 @@ CELERYBEAT_SCHEDULE ={
     },
 }
 # 使用celery与Redis，必须先启动Redis
+
+
+# memcached服务器
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+#         'LOCATION':[
+#             '127.0.0.1:11211'
+#         ]#这个是默认保存在服务端的本地,所以得改了
+#     }
+# }
+
+
+
+# redis 缓存
+'''
+CACHES = {
+    'default':{
+        "BACKEND":'django_redis.cache.RedisCache',
+        'LOCATION':[
+            'redis://127.0.0.1:6379/1'
+        ],
+        'OPTIONS':{
+            "CLTIONS":{
+                'CLIENT_CLASS':'django_redis.client.DefaultClient'
+            }
+        }
+    }
+}
+'''
+
+
+# mysql 缓存
+'''
+CACHES = {
+    'default':{
+        "BACKEND":"django.core.cache.backends.db.DatabaseCache",
+        'LOCATION':'cache_table'#存放缓存的表
+    }
+}
+'''

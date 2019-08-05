@@ -32,3 +32,8 @@ urlpatterns+=[
     path(r'ajax_api/',ajax_api),
     path('get_add/',get_add),
 ]
+
+from django.views.decorators.cache import cache_page
+urlpatterns+=[
+    path(r'swv/',cache_page(15*60)(small_white_views))
+]
