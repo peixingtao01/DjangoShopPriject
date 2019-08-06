@@ -20,7 +20,7 @@
 			<div class="fr">
                 {% if request.COOKIES.username %}
                 <div class="login_btn fl">
-					<a href="login.html">{{ request.COOKIES.username }}</a>
+					<a href="/buyer/user_info/">{{ request.COOKIES.username }}</a>
 					<span>|</span>
 					<a href="/buyer/logout/">退出</a>
 				</div>
@@ -33,7 +33,7 @@
                 {% endif %}
 				<div class="user_link fl">
 					<span>|</span>
-					<a href="user_center_info.html">用户中心</a>
+					<a href="/buyer/user_info/">用户中心</a>
 					<span>|</span>
 					<a href="/buyer/cart/">我的购物车</a>
 					<span>|</span>
@@ -53,7 +53,7 @@
 		</div>
 		<div class="guest_cart fr">
 			<a href="/buyer/cart/" class="cart_name fl">我的购物车</a>
-			<div class="goods_count fl" id="show_count">1</div>
+			<div class="goods_count fl" id="show_count">清</div>
 		</div>
 	</div>
 

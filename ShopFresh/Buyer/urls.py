@@ -28,5 +28,8 @@ urlpatterns+=[
 ]
 
 urlpatterns+=[
-    path('place_order/',place_order),
+    path('place_order/',place_order),#订单中心
+]
+urlpatterns+=[
+    path('user_info/',user_info),#用户中心
 ]

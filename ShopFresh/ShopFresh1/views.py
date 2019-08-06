@@ -269,7 +269,7 @@ def sendMail(request):
     send_mail('邮件主题','邮件内容','from_email',['to_email'],fail_silently=False)
 
 
-
+# 体验了一把异步缓存
 from CeleryTask.tasks import add
 from django.http import JsonResponse
 def get_add(requset):

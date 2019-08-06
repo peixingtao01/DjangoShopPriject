@@ -4,6 +4,7 @@ import time
 import hashlib
 from django.shortcuts import render,HttpResponse
 from django.shortcuts import HttpResponseRedirect
+from django.db.models import Count
 from Buyer.models import *
 from ShopFresh1.models import Goods,GoodsType
 
@@ -279,6 +280,11 @@ def cart_add(request):
 def cart(request):#另一种购物车
     user_id = request.COOKIES.get('user_id')
     goods = Cart.objects.filter(buyer_id = user_id)
+    goods_count = Cart.objects.values('buyer_id').annotate(count=Count('goods_carts'))
+    # <QuerySet [{'count': 3, 'buyer_id': 2}]>
+    a = []
+    for x in goods_count:
+        a.append(x)
     if request.method =='POST':
         post_data = request.POST#post过来的是个字典
         cart_data = []
@@ -316,6 +322,7 @@ def cart(request):#另一种购物车
             order_detail.save()
         url = '/buyer/place_order/?order_id=%s'%order.id
         return HttpResponseRedirect(url)
+
     return render(request,'buyer/cart.html',locals())
 
 
@@ -363,8 +370,15 @@ def user_site(request):
     return render(request,'buyer/user_site.html',locals())
 
 
+# 用户中心
+@LoginValid
+def user_info(request):
+    user_name = request.COOKIES.get('user_id')
+    user = int(user_name)
+    buyer = Buyer.objects.filter(id=user).first()
+    return render(request, 'buyer/user_info.html', locals())
 
-# 得到名称价格数量,总价
+        # 得到名称价格数量,总价
 
 
 
